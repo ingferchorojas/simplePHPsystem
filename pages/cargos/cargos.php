@@ -3,10 +3,32 @@
 include('../../config/db.php');
 
 // Consulta para obtener los cargos
-$sql = "SELECT c.fecha, c.cliente_id, cl.nombre, cl.apellido, c.numero_documento, c.dias_credito, c.cargo, c.concepto
-        FROM cargos c
-        INNER JOIN clientes cl ON c.cliente_id = cl.id
-        WHERE c.deleted = 0";
+$sql = "
+    SELECT 
+        c.id, 
+        c.fecha, 
+        c.cliente_id, 
+        cl.nombre, 
+        cl.apellido, 
+        c.numero_documento, 
+        c.dias_credito, 
+        c.cargo, 
+        c.concepto, 
+        SUM(a.monto_abono) AS total_abonos,
+        IF(DATEDIFF(CURRENT_DATE, DATE_ADD(c.fecha, INTERVAL c.dias_credito DAY)) < 0, 0, DATEDIFF(CURRENT_DATE, DATE_ADD(c.fecha, INTERVAL c.dias_credito DAY))) AS dias_vencidos
+    FROM 
+        cargos c
+    INNER JOIN 
+        clientes cl ON c.cliente_id = cl.id
+    LEFT JOIN 
+        abonos a ON a.numero_documento = c.numero_documento
+    WHERE 
+        c.deleted = 0
+    GROUP BY 
+        c.id
+";
+
+
 $result = $conn->query($sql);
 ?>
 
@@ -35,48 +57,61 @@ $result = $conn->query($sql);
         
         <!-- Botón para agregar cargo -->
         <a href="agregar_cargo.php" class="btn btn-primary mb-3">Agregar Cargo</a>
-
+        <a href="agregar_abono.php" class="btn btn-primary mb-3">Agregar Abono</a>
         <?php if ($result->num_rows > 0): ?>
             <table id="cargosTable" class="table table-bordered mt-4">
                 <thead>
                     <tr>
+                        <th>Id</th>
                         <th>Fecha</th>
                         <th>Cliente</th>
                         <th>Documento</th>
                         <th>Días de Crédito</th>
                         <th>Cargo</th>
                         <th>Concepto</th>
+                        <th>Días vencido</th>
+                        <th>Abonos</th>
+                        <th>Saldo restante</th>
+                        <th>Detalles</th>
                         <th>Editar</th>
                         <th>Eliminar</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo $row["fecha"]; ?></td>
-                            <td><?php echo $row["nombre"] . " " . $row["apellido"]; ?></td>
-                            <td><?php echo $row["numero_documento"]; ?></td>
-                            <td><?php echo $row["dias_credito"]; ?></td>
-                            <td><?php echo number_format($row["cargo"], 0, '', '.'); ?> Gs</td>
-                            <td><?php echo $row["concepto"]; ?></td>
-                            <td>
-                                <!-- Enlace para editar con ícono -->
-                                <a href="editar_cargo.php?id=<?php echo $row['cliente_id']; ?>" class="btn btn-warning btn-sm">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            </td>
-                            <td>
-                                <!-- Formulario para eliminar (marcar como eliminado) con ícono -->
-                                <form action="eliminar_cargo.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este cargo?');">
-                                    <input type="hidden" name="id" value="<?php echo $row['cliente_id']; ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
+                <?php while($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $row['id']; ?></td>
+                        <td><?php echo $row["fecha"]; ?></td>
+                        <td><?php echo $row["nombre"] . " " . $row["apellido"]; ?></td>
+                        <td><?php echo $row["numero_documento"]; ?></td>
+                        <td><?php echo $row["dias_credito"]; ?></td>
+                        <td><?php echo number_format($row["cargo"], 0, '', '.'); ?> Gs</td>
+                        <td><?php echo $row["concepto"]; ?></td>
+                        <td><?php echo $row["dias_vencidos"]; ?></td> <!-- Aquí puedes dejar el cálculo de días vencidos si lo necesitas -->
+                        <td><?php echo number_format($row["total_abonos"], 0, '', '.'); ?> Gs</td> <!-- Mostrar el total de abonos -->
+                        <td><?php echo number_format($row["cargo"] - $row["total_abonos"], 0, '', '.'); ?> Gs</td> <!-- Mostrar el restante -->
+                        <td>
+                            <a href="ver_detalles.php?id=<?php echo $row['id']; ?>" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <a href="editar_cargo.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <form action="eliminar_cargo.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este cargo?');">
+                                <input type="hidden" name="id" value="<?php echo $row['cliente_id']; ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+</tbody>
+
             </table>
         <?php else: ?>
             <p>No se encontraron cargos.</p>
