@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost:3306
--- Tiempo de generación: 07-01-2025 a las 18:50:51
+-- Tiempo de generación: 08-01-2025 a las 17:22:37
 -- Versión del servidor: 10.11.8-MariaDB-0ubuntu0.24.04.1
 -- Versión de PHP: 8.3.6
 
@@ -43,7 +43,9 @@ CREATE TABLE `abonos` (
 --
 
 INSERT INTO `abonos` (`id`, `fecha`, `monto_abono`, `nota`, `cliente_id`, `numero_documento`, `cargo_id`, `deleted`) VALUES
-(5, '2025-01-07', 250000.00, '', 1, 1, NULL, 0);
+(7, '2025-01-02', 100000.00, '', 2, 2, NULL, 0),
+(8, '2025-01-08', 250000.00, '', 1, 1, NULL, 0),
+(9, '2025-01-08', 250000.00, '', 1, 1, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -67,7 +69,9 @@ CREATE TABLE `cargos` (
 --
 
 INSERT INTO `cargos` (`id`, `fecha`, `cliente_id`, `numero_documento`, `dias_credito`, `cargo`, `concepto`, `deleted`) VALUES
-(4, '2025-01-07', 1, 1, 15, 1000000.00, 'Venta a crédito según doc #1', 0);
+(4, '2025-01-07', 1, 1, 15, 1000000.00, 'Venta a crédito según doc #1', 0),
+(5, '2025-01-01', 2, 2, 5, 500000.00, 'Documento #2', 0),
+(6, '2024-10-10', 1, 3, 15, 2500000.00, 'Documento #3', 0);
 
 -- --------------------------------------------------------
 
@@ -88,7 +92,8 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id`, `nombre`, `apellido`, `telefono`, `deleted`) VALUES
-(1, 'Fernando', 'Rojas', '0971422641', 0);
+(1, 'Fernando', 'Rojas', '0971422641', 0),
+(2, 'Luz', 'Vázquez', '0984601807', 0);
 
 --
 -- Índices para tablas volcadas
@@ -124,19 +129,19 @@ ALTER TABLE `clientes`
 -- AUTO_INCREMENT de la tabla `abonos`
 --
 ALTER TABLE `abonos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `cargos`
 --
 ALTER TABLE `cargos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas

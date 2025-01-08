@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My PHP Project</title>
+    <title>Control de cuentas</title>
     <!-- Bootstrap CSS local -->
     <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome CSS local -->
@@ -12,7 +12,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="./">MyProject</a>
+            <a class="navbar-brand" href="./">Control de cuentas</a>
         </div>
     </nav>
 
@@ -51,7 +51,7 @@
                         <i class="fas fa-calendar-alt fa-3x mb-3"></i>
                         <h5 class="card-title">Antigüedad de Saldos</h5>
                         <p class="card-text">Consulta la antigüedad de los saldos de los clientes.</p>
-                        <a href="#" class="btn btn-primary">Ver Antigüedad</a>
+                        <a href="pages/saldos/saldos.php" class="btn btn-primary">Ver Antigüedad</a>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                         <i class="fas fa-chart-line fa-3x mb-3"></i>
                         <h5 class="card-title">Estado de Cuentas</h5>
                         <p class="card-text">Consulta el estado de las cuentas de los clientes.</p>
-                        <a href="#" class="btn btn-primary">Ver Estado</a>
+                        <a href="pages/estado_cuentas/estado_cuentas.php" class="btn btn-primary">Ver Estado</a>
                     </div>
                 </div>
             </div>
