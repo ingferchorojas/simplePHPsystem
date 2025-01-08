@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn btn-primary">Agregar Abono</button>
         </form>
 
-        <a href="abonos.php" class="btn btn-secondary mt-3">Volver a la lista de abonos</a>
+        <a href="cargos.php" class="btn btn-secondary mt-3">Volver a la lista de abonos</a>
     </div>
 
     <!-- Modal para mostrar la lista de clientes -->
