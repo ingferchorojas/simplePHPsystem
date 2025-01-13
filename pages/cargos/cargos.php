@@ -58,6 +58,7 @@ $result = $conn->query($sql);
         <!-- Botón para agregar cargo -->
         <a href="agregar_cargo.php" class="btn btn-primary mb-3">Agregar Cargo</a>
         <a href="agregar_abono.php" class="btn btn-primary mb-3">Agregar Abono</a>
+        <a href="cargos_pdf.php" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         <?php if ($result->num_rows > 0): ?>
             <table id="cargosTable" class="table table-bordered mt-4">
                 <thead>

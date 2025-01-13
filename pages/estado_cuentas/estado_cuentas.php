@@ -146,6 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <button type="submit" class="btn btn-primary">Consultar</button>
         </form>
 
+        
+
         <!-- Mostrar los resultados -->
         <?php if (isset($movimientos) && count($movimientos) > 0): ?>
         <table class="table table-bordered mt-4">
@@ -176,6 +178,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- Mostrar el total adeudado -->
         <div class="mt-3">
             <h4>Total adeudado: <?php echo number_format($total_adeudado, 0, ',', '.'); ?></h4>
+            <!-- Botón para imprimir saldos en pdf -->
+            <a href="estado_cuentas_pdf.php?cliente_id=<?php echo $cliente_id; ?>&fecha_desde=<?php echo $fecha_desde; ?>&fecha_hasta=<?php echo $fecha_hasta; ?>" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         </div>
 
         <?php else: ?>

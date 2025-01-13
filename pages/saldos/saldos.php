@@ -68,6 +68,8 @@ $result = $conn->query($sql);
 
     <div class="container mt-5">
         <h2>Lista de Saldos</h2>
+         <!-- Botón para imprimir saldos en pdf -->
+         <a href="saldos_pdf.php" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         <?php if (isset($result) && $result->num_rows > 0): ?>
             <table id="saldosTable" class="table table-bordered mt-4">
                 <thead>

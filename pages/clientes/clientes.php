@@ -33,6 +33,9 @@ $result = $conn->query($sql);
         <!-- Botón para agregar cliente -->
         <a href="agregar_cliente.php" class="btn btn-primary mb-3">Agregar Cliente</a>
 
+        <!-- Botón para imprimir clientes en pdf -->
+        <a href="clientes_pdf.php" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
+
         <?php if ($result->num_rows > 0): ?>
             <table id="clientesTable" class="table table-bordered mt-4">
                 <thead>
