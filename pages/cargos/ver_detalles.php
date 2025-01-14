@@ -91,7 +91,7 @@ $total_restante = $cargo['cargo'] - $total_abonado;
 
     <div class="container">
         <h2>Detalles del Cargo</h2>
-
+        <a href="detalles_pdf.php?id=<?php echo $id_cargo; ?>" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         <!-- Información del Cargo -->
         <div class="details-box">
             <h4>Información del Cargo</h4>
