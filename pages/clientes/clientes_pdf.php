@@ -54,7 +54,9 @@ if ($result->num_rows > 0) {
         $pdf->Ln();
     }
 } else {
-    $pdf->Cell(0, 10, utf8_decode('No se encontraron clientes.'), 1, 1, 'C');
+    // Ajustar el ancho de la celda al total de las columnas
+    $totalWidth = 20 + 50 + 50 + 50;
+    $pdf->Cell($totalWidth, 10, utf8_decode('No se encontraron clientes.'), 1, 1, 'C');
 }
 
 // Salida del PDF en el navegador

@@ -103,7 +103,7 @@ $result = $conn->query($sql);
                         </td>
                         <td>
                             <form action="eliminar_cargo.php" method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar este cargo?');">
-                                <input type="hidden" name="id" value="<?php echo $row['cliente_id']; ?>">
+                                <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                 <button type="submit" class="btn btn-danger btn-sm">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
