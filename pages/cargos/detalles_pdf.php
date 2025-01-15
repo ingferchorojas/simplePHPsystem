@@ -73,6 +73,18 @@ if ($result->num_rows > 0) {
     ";
     $result_abonos = $conn->query($sql_abonos);
 
+    // Calcular el total de abonos
+    $total_abonos = 0;
+    while ($abono = $result_abonos->fetch_assoc()) {
+        $total_abonos += $abono['monto_abono'];
+    }
+
+    // Calcular el saldo restante
+    $saldo_restante = $cargo['cargo'] - $total_abonos;
+
+    // Reposicionar la consulta para obtener nuevamente los abonos
+    $result_abonos->data_seek(0); // Reinicia el puntero del resultado de abonos
+
     // Encabezado de detalles del cargo
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->Cell(50, 10, 'Campo', 1);
@@ -107,6 +119,11 @@ if ($result->num_rows > 0) {
 
     $pdf->Cell(50, 10, 'Concepto:', 1);
     $pdf->MultiCell(100, 10, utf8_decode($cargo['concepto']), 1);
+
+    // Mostrar saldo restante
+    $pdf->Cell(50, 10, 'Saldo Restante:', 1);
+    $pdf->Cell(100, 10, number_format($saldo_restante, 0, '', '.') . ' Gs', 1);
+    $pdf->Ln();
 
     // Encabezado de abonos
     $pdf->Ln(5);
