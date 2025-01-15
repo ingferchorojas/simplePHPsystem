@@ -38,16 +38,6 @@ CREATE TABLE `abonos` (
   `deleted` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `abonos`
---
-
-INSERT INTO `abonos` (`id`, `fecha`, `monto_abono`, `nota`, `cliente_id`, `numero_documento`, `cargo_id`, `deleted`) VALUES
-(7, '2025-01-02', 100000.00, '', 2, 2, NULL, 0),
-(8, '2025-01-08', 250000.00, '', 1, 1, NULL, 0),
-(9, '2025-01-08', 250000.00, '', 1, 1, NULL, 0);
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `cargos`
@@ -64,16 +54,6 @@ CREATE TABLE `cargos` (
   `deleted` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `cargos`
---
-
-INSERT INTO `cargos` (`id`, `fecha`, `cliente_id`, `numero_documento`, `dias_credito`, `cargo`, `concepto`, `deleted`) VALUES
-(4, '2025-01-07', 1, 1, 15, 1000000.00, 'Venta a crédito según doc #1', 0),
-(5, '2025-01-01', 2, 2, 5, 500000.00, 'Documento #2', 0),
-(6, '2024-10-10', 1, 3, 15, 2500000.00, 'Documento #3', 0);
-
--- --------------------------------------------------------
 
 --
 -- Estructura de tabla para la tabla `clientes`
@@ -86,14 +66,6 @@ CREATE TABLE `clientes` (
   `telefono` varchar(15) DEFAULT NULL,
   `deleted` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `clientes`
---
-
-INSERT INTO `clientes` (`id`, `nombre`, `apellido`, `telefono`, `deleted`) VALUES
-(1, 'Fernando', 'Rojas', '0971422641', 0),
-(2, 'Luz', 'Vázquez', '0984601807', 0);
 
 --
 -- Índices para tablas volcadas
