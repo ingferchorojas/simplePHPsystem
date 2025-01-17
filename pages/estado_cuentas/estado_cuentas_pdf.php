@@ -43,7 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             ca.numero_documento AS documento,
             ca.cargo AS cargo,
             0 AS abono,
-            ca.cargo AS subtotal
+            ca.cargo AS subtotal,
+            ca.concepto AS nota -- Aquí agregamos la columna 'concepto' para los cargos
         FROM 
             clientes cl
         JOIN 
@@ -64,7 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
             ab.numero_documento AS documento,
             0 AS cargo,
             ab.monto_abono AS abono,
-            ab.monto_abono AS subtotal
+            ab.monto_abono AS subtotal,
+            ab.nota AS nota -- Aquí agregamos la columna 'nota' para los abonos
         FROM 
             clientes cl
         JOIN 
@@ -105,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
 // Crear el objeto PDF
 $pdf = new FPDF();
-$pdf->AddPage();
+$pdf->AddPage('L'); // Cambiar a orientación horizontal (landscape)
 
 // Incluir el logo en la parte superior
 $pdf->Image('../../assets/logo.jpeg', 10, 10, 30); // Ajusta la ruta y el tamaño (10, 10, 30) si es necesario
@@ -118,29 +120,44 @@ $pdf->Ln(5); // Reducir el espacio antes de la tabla
 
 // Establecer encabezado de la tabla
 $pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(30, 10, 'Fecha', 1, 0, 'C');
-$pdf->Cell(30, 10, 'Concepto', 1, 0, 'C');
-$pdf->Cell(40, 10, 'Numero Documento', 1, 0, 'C');
+$pdf->Cell(20, 10, 'Fecha', 1, 0, 'C');
+$pdf->Cell(20, 10, 'Concepto', 1, 0, 'C');
+$pdf->Cell(40, 10, utf8_decode('N° Documento'), 1, 0, 'C');
 $pdf->Cell(25, 10, 'Cargo', 1, 0, 'C');
 $pdf->Cell(25, 10, 'Abono', 1, 0, 'C');
-$pdf->Cell(30, 10, 'Subtotal', 1, 1, 'C');
+$pdf->Cell(30, 10, 'Subtotal', 1, 0, 'C');
+$pdf->Cell(110, 10, 'Notas', 1, 1, 'C'); // Hacer la columna "Notas" más ancha
 
 // Llenar la tabla con los datos
 $pdf->SetFont('Arial', '', 10);
 foreach ($movimientos as $movimiento) {
-    $pdf->Cell(30, 10, utf8_decode($movimiento['fecha']), 1, 0, 'C');
-    $pdf->Cell(30, 10, utf8_decode($movimiento['concepto']), 1, 0, 'C');
+    $nota = utf8_decode($movimiento['concepto'] == 'Cargo' ? $movimiento['nota'] : $movimiento['nota']);
+    $pdf->Cell(20, 10, utf8_decode($movimiento['fecha']), 1, 0, 'C');
+    $pdf->Cell(20, 10, utf8_decode($movimiento['concepto']), 1, 0, 'C');
     $pdf->Cell(40, 10, utf8_decode($movimiento['documento']), 1, 0, 'C');
     $pdf->Cell(25, 10, number_format($movimiento['cargo'], 0, '', '.'), 1, 0, 'C');
     $pdf->Cell(25, 10, number_format($movimiento['abono'], 0, '', '.'), 1, 0, 'C');
-    $pdf->Cell(30, 10, number_format($movimiento['subtotal'], 0, '', '.'), 1, 1, 'C');
+    $pdf->Cell(30, 10, number_format($movimiento['subtotal'], 0, '', '.'), 1, 0, 'C');
+    
+    // Usar Cell en lugar de MultiCell para la columna de Notas
+    $pdf->Cell(110, 10, $nota, 1, 0, 'C'); // La columna de Notas con un solo Cell
+
+    // Asegurarse de que la próxima fila esté en la misma línea
+    $pdf->Ln();
 }
 
-// Mostrar el total adeudado
+// Mostrar el total adeudado con el mismo ancho de la tabla
 $pdf->Ln(10);
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(150, 10, 'Total Adeudado:', 1, 0, 'R');
-$pdf->Cell(30, 10, number_format($total_adeudado, 0, '', '.'), 1, 1, 'C');
+$total_width = 30 + 30 + 40 + 25 + 25 + 30 + 40; // Ancho total de las columnas de la tabla (sin contar las celdas de "Notas")
+$pdf->Cell($total_width, 10, 'Total Adeudado:', 1, 0, 'R'); // Ancho de la celda igual al ancho total de la tabla
+$pdf->Cell(50, 10, number_format($total_adeudado, 0, '', '.'), 1, 1, 'C'); // La columna de Total Adeudado ocupa el espacio restante
+
+// Mostrar el número de página
+$pdf->AliasNbPages();
+$pdf->SetFont('Arial', 'I', 8);
+$pdf->Ln(5); 
+$pdf->Cell(0, 10, utf8_decode('Página ') . $pdf->PageNo() . ' de {nb}', 0, 0, 'C');
 
 // Salida del PDF
 $pdf->Output();

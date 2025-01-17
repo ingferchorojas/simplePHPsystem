@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-5" style="max-width: 600px;">
         <h2>Formulario de Nuevo Cliente</h2>
 
         <form action="agregar_cliente.php" method="POST">

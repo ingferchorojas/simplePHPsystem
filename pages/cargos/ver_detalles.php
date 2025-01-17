@@ -73,10 +73,6 @@ $total_restante = $cargo['cargo'] - $total_abonado;
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/fontawesome/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
         .details-box {
             padding: 15px;
             border: 1px solid #ccc;
@@ -89,7 +85,13 @@ $total_restante = $cargo['cargo'] - $total_abonado;
 </head>
 <body>
 
-    <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../">Inicio</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
         <h2>Detalles del Cargo</h2>
         <a href="detalles_pdf.php?id=<?php echo $id_cargo; ?>" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         <!-- Información del Cargo -->
@@ -146,6 +148,8 @@ $total_restante = $cargo['cargo'] - $total_abonado;
         </div>
 
         <a href="cargos.php" class="btn btn-secondary">Volver a la lista de cargos</a>
+        <br>
+        <br>
     </div>
 
     <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>

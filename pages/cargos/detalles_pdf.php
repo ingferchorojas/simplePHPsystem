@@ -154,7 +154,7 @@ if ($result->num_rows > 0) {
             $pdf->Ln();
         }
     } else {
-        $pdf->Cell(0, 10, utf8_decode('No se encontraron abonos.'), 1, 1, 'C');
+        $pdf->Cell(150, 10, utf8_decode('No se encontraron abonos.'), 1, 1, 'C');
     }
 } else {
     $pdf->Cell(0, 10, utf8_decode('No se encontró el cargo solicitado.'), 1, 1, 'C');

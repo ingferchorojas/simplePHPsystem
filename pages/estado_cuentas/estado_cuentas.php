@@ -111,6 +111,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Incluir CSS de DataTables -->
     <link href="../../assets/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <style>
+        input[readonly], textarea[readonly] {
+            background-color: #f5f5f5;
+            border: 1px solid #dcdcdc;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -119,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-5" style="max-width: 600px;">
         <h2>Estado de Cuentas</h2>
 
         <!-- Formulario para seleccionar fechas y cliente -->
@@ -145,8 +152,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <button type="submit" class="btn btn-primary">Consultar</button>
         </form>
-
-        
 
         <!-- Mostrar los resultados -->
         <?php if (isset($movimientos) && count($movimientos) > 0): ?>
@@ -193,7 +198,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="../../assets/jquery/jquery-3.6.0.min.js"></script>
     <!-- Incluir Bootstrap JS -->
     <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+    <script src="../../assets/datatables/js/jquery.dataTables.min.js"></script>
     <script>
         // Función para cargar clientes con filtro
         function cargarClientes(filtro = '') {

@@ -44,6 +44,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Agregar Abono</title>
     <!-- Incluir Bootstrap para los estilos -->
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../assets/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <style>
+        input[readonly], textarea[readonly] {
+            background-color: #f5f5f5;
+            border: 1px solid #dcdcdc;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -52,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </nav>
 
-    <div class="container mt-5">
+    <div class="container mt-5" style="max-width: 600px;">
         <h2>Formulario de Nuevo Abono</h2>
 
         <form action="agregar_abono.php" method="POST">
@@ -94,43 +102,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <a href="cargos.php" class="btn btn-secondary mt-3">Volver a la lista de abonos</a>
     </div>
 
-    <!-- Modal para mostrar la lista de clientes -->
-    <div class="modal fade" id="clientesModal" tabindex="-1" aria-labelledby="clientesModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="clientesModalLabel">Seleccionar Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="buscarCliente" class="form-control mb-3" placeholder="Buscar cliente por nombre o teléfono">
-                    <table class="table table-bordered" id="clientesTable">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Teléfono</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Aquí se cargarán los clientes dinámicamente -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Incluir jQuery y Bootstrap JS -->
     <script src="../../assets/jquery/jquery-3.6.0.min.js"></script>
     <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/datatables/js/jquery.dataTables.min.js"></script>
 
     <script>
-        // Cargar clientes en el modal
+        // Función para cargar clientes con filtro
         function cargarClientes(filtro = '') {
             $.ajax({
-                url: 'buscar_clientes.php', // Archivo para buscar clientes
+                url: 'buscar_clientes.php', // Archivo que realiza la búsqueda de clientes
                 method: 'GET',
                 data: { filtro: filtro },
                 success: function(data) {
@@ -142,28 +124,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <td>${cliente.nombre}</td>
                                 <td>${cliente.apellido}</td>
                                 <td>${cliente.telefono}</td>
-                                <td><button class="btn btn-success btn-sm select-client" data-id="${cliente.id}" data-nombre="${cliente.nombre} ${cliente.apellido}">Seleccionar</button></td>
+                                <td><button class="btn btn-success btn-sm select-client" data-id="${cliente.id}" data-nombre="${cliente.nombre}" data-apellido="${cliente.apellido}">Seleccionar</button></td>
                             </tr>
                         `;
                     });
                     $('#clientesTable tbody').html(clientesHtml);
+                    $('#clientesTable').DataTable(); // Inicializa DataTables después de cargar los clientes
                 }
             });
         }
 
         function abrirModalClientes() {
-            const modal = new bootstrap.Modal(document.getElementById('clientesModal'));
-            modal.show();
-            cargarClientes();
+            var myModal = new bootstrap.Modal(document.getElementById('clientesModal'));
+            myModal.show();
+
+            cargarClientes(); // Cargar los clientes en el modal cuando se abre
         }
 
-        // Filtrar clientes en tiempo real
-        $('#buscarCliente').on('keyup', function() {
-            cargarClientes($(this).val());
-        });
-
-        // Seleccionar cliente y cargar números de documento
-        $(document).on('click', '.select-client', function() {
+         // Seleccionar cliente y cargar números de documento
+         $(document).on('click', '.select-client', function() {
             const clienteId = $(this).data('id');
             const clienteNombre = $(this).data('nombre');
             $('#cliente').val(clienteNombre);
@@ -188,5 +167,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $('#clientesModal').modal('hide');
         });
     </script>
+
+    <!-- Modal para mostrar la lista de clientes -->
+    <div class="modal fade" id="clientesModal" tabindex="-1" aria-labelledby="clientesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clientesModalLabel">Seleccionar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered" id="clientesTable">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Teléfono</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se cargarán los clientes dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
