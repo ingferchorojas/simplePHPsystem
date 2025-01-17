@@ -11,10 +11,17 @@ class PDF extends FPDF
     // Cabecera del PDF
     function Header()
     {
+        // Agregar el logo
+        $this->Image('../../assets/logo.jpeg', 10, 6, 30); // Ruta, posición X, posición Y, ancho
+        
+        // Ajustar el título debajo del logo
+        $this->SetY(20); // Posición más abajo
         $this->SetFont('Arial', 'B', 12);
         $this->Cell(0, 10, utf8_decode('Lista de Cargos'), 0, 1, 'C');
-        $this->Line(10, 20, 280, 20); // Línea horizontal
-        $this->Ln(10);
+        
+        // Dibujar la línea debajo del título
+        $this->Line(10, 30, 280, 30); // Línea horizontal
+        $this->Ln(10); // Espaciado adicional después de la línea
     }
 
     // Pie de página

@@ -107,10 +107,14 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 $pdf = new FPDF();
 $pdf->AddPage();
 
+// Incluir el logo en la parte superior
+$pdf->Image('../../assets/logo.jpeg', 10, 10, 30); // Ajusta la ruta y el tamaño (10, 10, 30) si es necesario
+
 // Establecer título
 $pdf->SetFont('Arial', 'B', 16);
+$pdf->Ln(20); // Reducir el espacio después del logo
 $pdf->Cell(0, 10, 'Estado de Cuentas', 0, 1, 'C');
-$pdf->Ln(10);
+$pdf->Ln(5); // Reducir el espacio antes de la tabla
 
 // Establecer encabezado de la tabla
 $pdf->SetFont('Arial', 'B', 10);

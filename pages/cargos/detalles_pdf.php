@@ -8,14 +8,25 @@ require('../../libs/fpdf/fpdf.php');
 // Crear una clase personalizada para el PDF
 class PDF extends FPDF
 {
+
     // Cabecera del PDF
-    function Header()
-    {
-        $this->SetFont('Arial', 'B', 12);
-        $this->Cell(0, 10, utf8_decode('Detalles del Cargo'), 0, 1, 'C');
-        $this->Line(10, 20, 200, 20);
-        $this->Ln(10);
-    }
+function Header()
+{
+    // Agregar el logo (ajustá la ruta según corresponda)
+    $this->Image('../../assets/logo.jpeg', 10, 6, 30);
+    
+    // Mover el cursor un poco más abajo antes de colocar el título y la línea
+    $this->Ln(15); // Mueve el cursor 15 unidades hacia abajo después del logo
+    
+    // Configurar el título
+    $this->SetFont('Arial', 'B', 12);
+    $this->Cell(0, 10, utf8_decode('Detalles del Cargo'), 0, 1, 'C');
+    
+    // Línea debajo del título
+    $this->Line(10, $this->GetY(), 200, $this->GetY()); // Línea debajo del título
+    $this->Ln(10); // Mueve más abajo el cursor después de la línea
+}
+
 
     // Pie de página
     function Footer()
@@ -151,4 +162,5 @@ if ($result->num_rows > 0) {
 
 // Salida del PDF en el navegador
 $pdf->Output('I', 'detalles_cargo.pdf');
+
 ?>

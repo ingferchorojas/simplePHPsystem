@@ -11,9 +11,12 @@ class PDF extends FPDF
     // Cabecera del PDF
     function Header()
     {
+        // Agregar el logo
+        $this->Image('../../assets/logo.jpeg', 10, 8, 33); // Ajusta la posición y el tamaño del logo
         $this->SetFont('Arial', 'B', 12);
+        $this->Ln(20); // Dejar un poco más de espacio para que el título y la línea estén un poco más arriba
         $this->Cell(0, 10, utf8_decode('Saldos de Clientes'), 0, 1, 'C');
-        $this->Line(10, 20, 280, 20); // Línea más ancha para página horizontal
+        $this->Line(10, 40, 280, 40); // Línea un poco más arriba
         $this->Ln(10);
     }
 
@@ -75,7 +78,6 @@ GROUP BY
 $result = $conn->query($sql);
 
 // Encabezados de la tabla
-// Encabezados de la tabla
 $pdf->SetFont('Arial', 'B', 8);
 $pdf->Cell(35, 10, utf8_decode('Cliente'), 1);
 $pdf->Cell(25, 10, utf8_decode('Fecha Doc.'), 1);
@@ -89,7 +91,6 @@ $pdf->Cell(25, 10, utf8_decode('31 a 60 días'), 1);
 $pdf->Cell(25, 10, utf8_decode('Más de 60'), 1);
 $pdf->Cell(25, 10, utf8_decode('Total Gen.'), 1);
 $pdf->Ln();
-
 
 // Datos de los saldos de los clientes
 $pdf->SetFont('Arial', '', 8);
@@ -111,7 +112,6 @@ if ($result->num_rows > 0) {
 } else {
     $pdf->Cell(266, 10, utf8_decode('No se encontraron saldos de clientes.'), 1, 1, 'C');
 }
-
 
 // Salida del PDF en el navegador
 $pdf->Output('I', 'saldos_clientes.pdf');
