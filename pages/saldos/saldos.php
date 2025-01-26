@@ -34,6 +34,7 @@ SELECT
         WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) > 60 THEN CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS mas_de_60_dias,
+    CAST(ca.cargo AS UNSIGNED) AS total_cargo,
     CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED) AS total_general
 FROM 
     cargos ca
@@ -67,7 +68,6 @@ $result = $conn->query($sql);
     <!-- FontAwesome CSS local -->
     <link href="../../assets/fontawesome/css/all.min.css" rel="stylesheet">
     <link rel="icon" href="../../assets/logo.png" type="image/png">
-
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -104,18 +104,35 @@ $result = $conn->query($sql);
         // Calcular el total a cobrar y la deuda pendiente
         $total_a_cobrar = 0;
         $deuda_pendiente = 0;
+        $totales_columnas = [
+            'no_vencido' => 0,
+            'de_1_a_15_dias' => 0,
+            'de_16_a_30_dias' => 0,
+            'de_31_a_60_dias' => 0,
+            'mas_de_60_dias' => 0,
+            'total_general' => 0,
+        ];
 
         if (isset($result) && $result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-                $total_a_cobrar += $row["total_general"];
+                $total_a_cobrar += $row["total_cargo"];
                 $deuda_pendiente += $row["total_general"];
+                foreach ($totales_columnas as $col => $total) {
+                    $totales_columnas[$col] += $row[$col];
+                }
             }
         }
         ?>
 
+        <?php
+        // Calcular el efectivo
+        $efectivo = $total_a_cobrar - $deuda_pendiente;
+        ?>
+
         <!-- Mostrar total a cobrar y deuda pendiente -->
-        <h2>Total a Cobrar: <?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</h2>
-        <h2>Deuda Pendiente: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h2>
+        <h3>Total a Cobrar: <?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</h3>
+        <h3>Deuda Pendiente: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h3>
+        <h3>Efectivo: <?= number_format($efectivo, 0, '', '.') ?> Gs</h3>
 
         <?php if (isset($result) && $result->num_rows > 0): ?>
             <table id="saldosTable" class="table table-bordered mt-4">
@@ -153,6 +170,16 @@ $result = $conn->query($sql);
                             <td><?= number_format($row["total_general"], 0, '', '.') . " Gs" ?></td>
                         </tr>
                     <?php endwhile; ?>
+                    <!-- Fila con los totales -->
+                    <tr>
+                        <td colspan="5"><strong>Total</strong></td>
+                        <td><strong><?= number_format($totales_columnas['no_vencido'], 0, '', '.') . " Gs" ?></strong></td>
+                        <td><strong><?= number_format($totales_columnas['de_1_a_15_dias'], 0, '', '.') . " Gs" ?></strong></td>
+                        <td><strong><?= number_format($totales_columnas['de_16_a_30_dias'], 0, '', '.') . " Gs" ?></strong></td>
+                        <td><strong><?= number_format($totales_columnas['de_31_a_60_dias'], 0, '', '.') . " Gs" ?></strong></td>
+                        <td><strong><?= number_format($totales_columnas['mas_de_60_dias'], 0, '', '.') . " Gs" ?></strong></td>
+                        <td><strong><?= number_format($totales_columnas['total_general'], 0, '', '.') . " Gs" ?></strong></td>
+                    </tr>
                 </tbody>
             </table>
         <?php else: ?>

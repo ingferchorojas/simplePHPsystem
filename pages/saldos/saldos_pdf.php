@@ -77,7 +77,8 @@ SELECT
         WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) > 60 THEN CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS mas_de_60_dias,
-    CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED) AS total_general
+    CAST(ca.cargo AS UNSIGNED) AS total_cargo,
+    CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED) AS total_general
 FROM 
     cargos ca
 LEFT JOIN 
@@ -97,31 +98,33 @@ if ($hasta) {
 
 $sql .= " GROUP BY ca.id";
 
+// Ejecutar consulta
 $result = $conn->query($sql);
 
-// Inicializar las variables para el total a cobrar y deuda pendiente
-$total_cobrar = 0;
+// Variables para mostrar los totales
+$total_a_cobrar = 0;
 $deuda_pendiente = 0;
 
-// Recorrer los resultados de la consulta para sumar los totales
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $total_cobrar += $row['total_general']; // Sumar al total a cobrar
-        $deuda_pendiente += $row['total_general']; // Sumar a la deuda pendiente
+// Calculamos los totales
+if (isset($result) && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $total_a_cobrar += $row["total_cargo"];
+        $deuda_pendiente += $row["total_general"];
     }
 }
 
-// Información adicional sobre "Total a cobrar" y "Deuda pendiente"
-$pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(150, 10, utf8_decode('Total a cobrar: '), 0, 0, 'R');
-$pdf->Cell(25, 10, number_format($total_cobrar, 0, '', '.'), 0, 1, 'C');
-    
-$pdf->Cell(150, 10, utf8_decode('Deuda pendiente: '), 0, 0, 'R');
-$pdf->Cell(25, 10, number_format($deuda_pendiente, 0, '', '.'), 0, 1, 'C');
-$pdf->Ln(10); // Espacio antes de la tabla
+$efectivo = $total_a_cobrar - $deuda_pendiente;
+
+
+// Mostrar los totales sobre la tabla
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(50, 10, utf8_decode('Total a cobrar: ' . number_format($total_a_cobrar, 0, '', '.') . ' Gs.'), 0, 0, 'L');
+$pdf->Cell(50, 10, utf8_decode('Deuda pendiente: ' . number_format($deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
+$pdf->Cell(50, 10, utf8_decode('Deuda pendiente: ' . number_format($total_a_cobrar - $deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
+
+$pdf->Ln(5);
 
 // Encabezados de la tabla
-$pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(50, 10, utf8_decode('Cliente'), 1, 0, 'C');
 $pdf->Cell(20, 10, utf8_decode('Fecha'), 1, 0, 'C');
 $pdf->Cell(25, 10, utf8_decode('Doc.'), 1, 0, 'C');
@@ -154,10 +157,9 @@ if ($result->num_rows > 0) {
         $pdf->Ln();
     }
 } else {
-    $pdf->Cell(266, 10, utf8_decode('No se encontraron saldos de clientes.'), 1, 1, 'C');
+    $pdf->Cell(280, 10, utf8_decode('No se encontraron saldos de clientes.'), 1, 1, 'C');
 }
 
 // Salida del PDF en el navegador
 $pdf->Output('I', 'saldos_clientes.pdf');
-
 ?>
