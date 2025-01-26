@@ -120,7 +120,7 @@ $efectivo = $total_a_cobrar - $deuda_pendiente;
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(50, 10, utf8_decode('Total a cobrar: ' . number_format($total_a_cobrar, 0, '', '.') . ' Gs.'), 0, 0, 'L');
 $pdf->Cell(50, 10, utf8_decode('Deuda pendiente: ' . number_format($deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
-$pdf->Cell(50, 10, utf8_decode('Deuda pendiente: ' . number_format($total_a_cobrar - $deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
+$pdf->Cell(50, 10, utf8_decode('Efectivo: ' . number_format($total_a_cobrar - $deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
 
 $pdf->Ln(5);
 

@@ -11,6 +11,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $dias_credito = $_POST['dias_credito'];
     $cargo = $_POST['cargo'];
     $concepto = $_POST['concepto'];
+    $kg = $_POST['kg']; // Obtener los kg del formulario
+    $precio_por_kg = $_POST['precio_por_kilo']; // Obtener el precio por kilo del formulario
 
     // Consulta para verificar si ya existe un documento con ese número
     $sql_check = "SELECT * FROM cargos WHERE numero_documento = '$doc_num'";
@@ -21,8 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<script>alert('El número de documento ya existe.'); window.location.href = 'agregar_cargo.php';</script>";
     } else {
         // Si no existe, insertar el nuevo cargo
-        $sql = "INSERT INTO cargos (cliente_id, fecha, numero_documento, dias_credito, cargo, concepto) 
-                VALUES ('$cliente_id', '$fecha', '$doc_num', '$dias_credito', '$cargo', '$concepto')";
+        $sql = "INSERT INTO cargos (cliente_id, fecha, numero_documento, dias_credito, cargo, concepto, kg, precio_por_kg) 
+                VALUES ('$cliente_id', '$fecha', '$doc_num', '$dias_credito', '$cargo', '$concepto', '$kg', '$precio_por_kg')";
 
         if ($conn->query($sql) === TRUE) {
             echo "<script>alert('Cargo agregado'); window.location.href = 'cargos.php';</script>";
@@ -32,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -178,7 +179,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 document.getElementById('cargo').value = cargo.toFixed(0);
 
                 // Concepto simplificado
-                const concepto = `Gs. ${precioPorKilo.toFixed(0)}/Kg | Kg: ${kg} | Total: Gs. ${cargo.toFixed(0)}`;
+                const concepto = `Gs. ${precioPorKilo.toFixed(0)}/Kg | Kg: ${kg}`;
                 document.getElementById('concepto').value = concepto;
             }
         }

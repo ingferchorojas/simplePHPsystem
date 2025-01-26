@@ -51,8 +51,11 @@ CREATE TABLE `cargos` (
   `dias_credito` int(11) NOT NULL,
   `cargo` decimal(10,2) NOT NULL,
   `concepto` varchar(255) NOT NULL,
+  `kg` decimal(10,2) NOT NULL,  -- Columna para los kilogramos
+  `precio_por_kg` decimal(10,2) NOT NULL,  -- Columna para el precio por kilogramo
   `deleted` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 --
