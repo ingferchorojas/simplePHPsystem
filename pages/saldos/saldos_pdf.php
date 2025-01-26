@@ -5,22 +5,37 @@ include('../../config/db.php');
 // Incluir la librería FPDF
 require('../../libs/fpdf/fpdf.php');
 
+// Recibir parámetros desde y hasta
+$desde = isset($_GET['desde']) ? $_GET['desde'] : null;
+$hasta = isset($_GET['hasta']) ? $_GET['hasta'] : null;
+
+// Validar formato de fecha
+function validarFecha($fecha) {
+    $formato = 'Y-m-d';
+    $d = DateTime::createFromFormat($formato, $fecha);
+    return $d && $d->format($formato) === $fecha;
+}
+
+if ($desde && !validarFecha($desde)) {
+    die("Fecha 'desde' inválida.");
+}
+if ($hasta && !validarFecha($hasta)) {
+    die("Fecha 'hasta' inválida.");
+}
+
 // Crear una clase personalizada para el PDF
 class PDF extends FPDF
 {
-    // Cabecera del PDF
     function Header()
     {
-        // Agregar el logo
-        $this->Image('../../assets/logo.jpeg', 10, 8, 33); // Ajusta la posición y el tamaño del logo
+        $this->Image('../../assets/logo.jpeg', 10, 8, 33);
         $this->SetFont('Arial', 'B', 12);
-        $this->Ln(20); // Dejar un poco más de espacio para que el título y la línea estén un poco más arriba
+        $this->Ln(20);
         $this->Cell(0, 10, utf8_decode('Saldos de Clientes'), 0, 1, 'C');
-        $this->Line(10, 40, 280, 40); // Línea un poco más arriba
+        $this->Line(10, 40, 280, 40);
         $this->Ln(10);
     }
 
-    // Pie de página
     function Footer()
     {
         $this->SetY(-15);
@@ -30,11 +45,11 @@ class PDF extends FPDF
 }
 
 // Crear instancia del PDF
-$pdf = new PDF('L', 'mm', 'A4'); // Orientación horizontal (L) y tamaño A4
+$pdf = new PDF('L', 'mm', 'A4');
 $pdf->AddPage();
 $pdf->SetFont('Arial', '', 10);
 
-// Consulta para obtener los saldos de los clientes
+// Construir la consulta SQL
 $sql = "
 SELECT 
     CONCAT(cl.nombre, ' ', cl.apellido) AS cliente_nombre,
@@ -71,42 +86,71 @@ INNER JOIN
     clientes cl ON ca.cliente_id = cl.id
 WHERE 
     ca.deleted = 0 AND cl.deleted = 0
-GROUP BY 
-    ca.id;
 ";
+
+if ($desde) {
+    $sql .= " AND ca.fecha >= '$desde'";
+}
+if ($hasta) {
+    $sql .= " AND ca.fecha <= '$hasta'";
+}
+
+$sql .= " GROUP BY ca.id";
 
 $result = $conn->query($sql);
 
+// Inicializar las variables para el total a cobrar y deuda pendiente
+$total_cobrar = 0;
+$deuda_pendiente = 0;
+
+// Recorrer los resultados de la consulta para sumar los totales
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $total_cobrar += $row['total_general']; // Sumar al total a cobrar
+        $deuda_pendiente += $row['total_general']; // Sumar a la deuda pendiente
+    }
+}
+
+// Información adicional sobre "Total a cobrar" y "Deuda pendiente"
+$pdf->SetFont('Arial', 'B', 12);
+$pdf->Cell(150, 10, utf8_decode('Total a cobrar: '), 0, 0, 'R');
+$pdf->Cell(25, 10, number_format($total_cobrar, 0, '', '.'), 0, 1, 'C');
+    
+$pdf->Cell(150, 10, utf8_decode('Deuda pendiente: '), 0, 0, 'R');
+$pdf->Cell(25, 10, number_format($deuda_pendiente, 0, '', '.'), 0, 1, 'C');
+$pdf->Ln(10); // Espacio antes de la tabla
+
 // Encabezados de la tabla
-$pdf->SetFont('Arial', 'B', 8);
-$pdf->Cell(35, 10, utf8_decode('Cliente'), 1);
-$pdf->Cell(25, 10, utf8_decode('Fecha Doc.'), 1);
-$pdf->Cell(20, 10, utf8_decode('N° Doc.'), 1);
-$pdf->Cell(18, 10, utf8_decode('Días Cr.'), 1);
-$pdf->Cell(18, 10, utf8_decode('Días Venc.'), 1);
-$pdf->Cell(25, 10, utf8_decode('No Venc.'), 1);
-$pdf->Cell(25, 10, utf8_decode('1 a 15 días'), 1);
-$pdf->Cell(25, 10, utf8_decode('16 a 30 días'), 1);
-$pdf->Cell(25, 10, utf8_decode('31 a 60 días'), 1);
-$pdf->Cell(25, 10, utf8_decode('Más de 60'), 1);
-$pdf->Cell(25, 10, utf8_decode('Total Gen.'), 1);
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(50, 10, utf8_decode('Cliente'), 1, 0, 'C');
+$pdf->Cell(20, 10, utf8_decode('Fecha'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('Doc.'), 1, 0, 'C');
+$pdf->Cell(20, 10, utf8_decode('Días Créd.'), 1, 0, 'C');
+$pdf->Cell(20, 10, utf8_decode('Días Venc.'), 1, 0, 'C');
+$pdf->Cell(20, 10, utf8_decode('No Venc.'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('1 a 15 días'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('16 a 30 días'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('31 a 60 días'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('Más de 60'), 1, 0, 'C');
+$pdf->Cell(25, 10, utf8_decode('Total'), 1, 0, 'C');
 $pdf->Ln();
 
 // Datos de los saldos de los clientes
-$pdf->SetFont('Arial', '', 8);
+$pdf->SetFont('Arial', '', 10);
 if ($result->num_rows > 0) {
+    $result->data_seek(0); // Volver al inicio del resultado
     while ($row = $result->fetch_assoc()) {
-        $pdf->Cell(35, 10, utf8_decode($row['cliente_nombre']), 1);
-        $pdf->Cell(25, 10, utf8_decode($row['fecha_documento']), 1);
-        $pdf->Cell(20, 10, utf8_decode($row['numero_documento']), 1);
-        $pdf->Cell(18, 10, $row['dias_credito'], 1);
-        $pdf->Cell(18, 10, $row['dias_vencido'], 1);
-        $pdf->Cell(25, 10, number_format($row['no_vencido'], 0, '', '.') . " Gs", 1);
-        $pdf->Cell(25, 10, number_format($row['de_1_a_15_dias'], 0, '', '.') . " Gs", 1);
-        $pdf->Cell(25, 10, number_format($row['de_16_a_30_dias'], 0, '', '.') . " Gs", 1);
-        $pdf->Cell(25, 10, number_format($row['de_31_a_60_dias'], 0, '', '.') . " Gs", 1);
-        $pdf->Cell(25, 10, number_format($row['mas_de_60_dias'], 0, '', '.') . " Gs", 1);
-        $pdf->Cell(25, 10, number_format($row['total_general'], 0, '', '.') . " Gs", 1);
+        $pdf->Cell(50, 10, utf8_decode($row['cliente_nombre']), 1, 0, 'C');
+        $pdf->Cell(20, 10, utf8_decode($row['fecha_documento']), 1, 0, 'C');
+        $pdf->Cell(25, 10, utf8_decode($row['numero_documento']), 1, 0, 'C');
+        $pdf->Cell(20, 10, $row['dias_credito'], 1, 0, 'C');
+        $pdf->Cell(20, 10, $row['dias_vencido'], 1, 0, 'C');
+        $pdf->Cell(20, 10, number_format($row['no_vencido'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['de_1_a_15_dias'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['de_16_a_30_dias'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['de_31_a_60_dias'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['mas_de_60_dias'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['total_general'], 0, '', '.'), 1, 0, 'C');
         $pdf->Ln();
     }
 } else {
@@ -115,4 +159,5 @@ if ($result->num_rows > 0) {
 
 // Salida del PDF en el navegador
 $pdf->Output('I', 'saldos_clientes.pdf');
+
 ?>

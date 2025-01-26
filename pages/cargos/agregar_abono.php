@@ -45,6 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Incluir Bootstrap para los estilos -->
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="icon" href="../../assets/logo.png" type="image/png">
+
     <style>
         input[readonly], textarea[readonly] {
             background-color: #f5f5f5;

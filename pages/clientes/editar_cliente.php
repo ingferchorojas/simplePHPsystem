@@ -80,6 +80,8 @@ $conn->close();
     <title>Editar Cliente</title>
     <!-- Incluir Bootstrap para los estilos -->
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="../../assets/logo.png" type="image/png">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">

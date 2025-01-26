@@ -72,6 +72,8 @@ $total_restante = $cargo['cargo'] - $total_abonado;
     <title>Detalles del Cargo</title>
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/fontawesome/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="../../assets/logo.png" type="image/png">
+
     <style>
         .details-box {
             padding: 15px;

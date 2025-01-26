@@ -33,42 +33,45 @@ class PDF extends FPDF
     }
 
     // Encabezado de la tabla
-    function TableHeader()
-    {
-        $this->SetFont('Arial', 'B', 10);
-        $this->Cell(20, 10, 'Id', 1, 0, 'C');
-        $this->Cell(30, 10, 'Fecha', 1, 0, 'C');
-        $this->Cell(50, 10, utf8_decode('Cliente'), 1, 0, 'C');
-        $this->Cell(30, 10, 'Documento', 1, 0, 'C');
-        $this->Cell(30, 10, utf8_decode('Días Crédito'), 1, 0, 'C');
-        $this->Cell(30, 10, 'Cargo', 1, 0, 'C');
-        $this->Cell(30, 10, utf8_decode('Días Vencidos'), 1, 0, 'C');
-        $this->Cell(30, 10, 'Abonos', 1, 0, 'C');
-        $this->Cell(30, 10, 'Saldo Restante', 1, 0, 'C');
-        $this->Ln();
-    }
+function TableHeader()
+{
+    $this->SetFont('Arial', 'B', 10);
+    $this->Cell(20, 10, 'Fecha', 1, 0, 'C');
+    $this->Cell(50, 10, utf8_decode('Cliente'), 1, 0, 'C');
+    $this->Cell(25, 10, 'Doc', 1, 0, 'C');
+    $this->Cell(20, 10, utf8_decode('Días Créd.'), 1, 0, 'C');
+    $this->Cell(25, 10, 'Cargo', 1, 0, 'C');
+    $this->Cell(60, 10, utf8_decode('Concepto'), 1, 0, 'C'); // Nueva columna
+    $this->Cell(25, 10, utf8_decode('Días Venc.'), 1, 0, 'C');
+    $this->Cell(25, 10, 'Abonos', 1, 0, 'C');
+    $this->Cell(25, 10, 'Restante', 1, 0, 'C');
+    $this->Ln();
+}
 
-    // Fila de datos
-    function TableRow($row)
-    {
-        $this->SetFont('Arial', '', 10);
-        $this->Cell(20, 10, $row['id'], 1, 0, 'C');
-        $this->Cell(30, 10, $row['fecha'], 1, 0, 'C');
-        $this->Cell(50, 10, utf8_decode($row['nombre'] . ' ' . $row['apellido']), 1, 0, 'C');
-        $this->Cell(30, 10, $row['numero_documento'], 1, 0, 'C');
-        $this->Cell(30, 10, $row['dias_credito'], 1, 0, 'C');
-        $this->Cell(30, 10, number_format($row['cargo'], 0, '', '.'), 1, 0, 'C');
-        $this->Cell(30, 10, $row['dias_vencidos'], 1, 0, 'C');
-        $this->Cell(30, 10, number_format($row['total_abonos'], 0, '', '.'), 1, 0, 'C');
-        $this->Cell(30, 10, number_format($row['cargo'] - $row['total_abonos'], 0, '', '.'), 1, 0, 'C');
-        $this->Ln();
-    }
+// Fila de datos
+function TableRow($row)
+{
+    $this->SetFont('Arial', '', 10);
+    $this->Cell(20, 10, $row['fecha'], 1, 0, 'C');
+    $this->Cell(50, 10, utf8_decode($row['nombre'] . ' ' . $row['apellido']), 1, 0, 'C');
+    $this->Cell(25, 10, $row['numero_documento'], 1, 0, 'C');
+    $this->Cell(20, 10, $row['dias_credito'], 1, 0, 'C');
+    $this->Cell(25, 10, number_format($row['cargo'], 0, '', '.'), 1, 0, 'C');
+    $this->Cell(60, 10, utf8_decode($row['concepto']), 1, 0, 'C'); // Nueva celda para el concepto
+    $this->Cell(25, 10, $row['dias_vencidos'], 1, 0, 'C');
+    $this->Cell(25, 10, number_format($row['total_abonos'], 0, '', '.'), 1, 0, 'C');
+    $this->Cell(25, 10, number_format($row['cargo'] - $row['total_abonos'], 0, '', '.'), 1, 0, 'C');
+    $this->Ln();
+}
+
 }
 
 // Crear instancia del PDF
 $pdf = new PDF();
-$pdf->AddPage('L'); // Establecer orientación horizontal
+// Cambiar a tamaño A3 o personalizar dimensiones
+$pdf->AddPage('L', 'A4'); // 'L' para orientación horizontal, 'A3' para tamaño más grande
 $pdf->SetFont('Arial', '', 10);
+
 
 // Consulta para obtener los cargos
 $sql = "

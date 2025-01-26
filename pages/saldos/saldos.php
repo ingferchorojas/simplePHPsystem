@@ -2,7 +2,11 @@
 // Incluir la conexión a la base de datos
 include('../../config/db.php');
 
-// Consulta para obtener los datos necesarios
+// Variables para las fechas
+$fecha_desde = isset($_GET['desde']) ? $_GET['desde'] : '';
+$fecha_hasta = isset($_GET['hasta']) ? $_GET['hasta'] : '';
+
+// Consulta SQL con rango de fechas
 $sql = "
 SELECT 
     CONCAT(cl.nombre, ' ', cl.apellido) AS cliente_nombre,
@@ -15,33 +19,37 @@ SELECT
         ELSE 0 
     END AS no_vencido,
     CASE 
-        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 1 AND 15 THEN CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED)
+        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 1 AND 15 THEN CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS de_1_a_15_dias,
     CASE 
-        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 16 AND 30 THEN CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED)
+        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 16 AND 30 THEN CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS de_16_a_30_dias,
     CASE 
-        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 31 AND 60 THEN CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED)
+        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) BETWEEN 31 AND 60 THEN CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS de_31_a_60_dias,
     CASE 
-        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) > 60 THEN CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED)
+        WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) > 60 THEN CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED)
         ELSE 0 
     END AS mas_de_60_dias,
-    CAST(ca.cargo - COALESCE(SUM(ab.monto_abono), 0) AS UNSIGNED) AS total_general
+    CAST(ca.cargo - IFNULL(SUM(ab.monto_abono), 0) AS UNSIGNED) AS total_general
 FROM 
     cargos ca
 LEFT JOIN 
-    abonos ab ON ab.numero_documento = ca.numero_documento AND ab.deleted = 0  -- Verificación de que el abono no esté eliminado
+    abonos ab ON ab.numero_documento = ca.numero_documento AND ab.deleted = 0
 INNER JOIN 
     clientes cl ON ca.cliente_id = cl.id
 WHERE 
-    ca.deleted = 0 AND cl.deleted = 0
-GROUP BY 
-    ca.id;
-";
+    ca.deleted = 0 AND cl.deleted = 0";
+
+// Agregar filtro de fechas si se proporcionan
+if (!empty($fecha_desde) && !empty($fecha_hasta)) {
+    $sql .= " AND ca.fecha BETWEEN '$fecha_desde' AND '$fecha_hasta'";
+}
+
+$sql .= " GROUP BY ca.id";
 
 $result = $conn->query($sql);
 ?>
@@ -58,6 +66,8 @@ $result = $conn->query($sql);
     <link href="../../assets/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
     <!-- FontAwesome CSS local -->
     <link href="../../assets/fontawesome/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="../../assets/logo.png" type="image/png">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -68,8 +78,45 @@ $result = $conn->query($sql);
 
     <div class="container mt-5">
         <h2>Lista de Saldos</h2>
-         <!-- Botón para imprimir saldos en pdf -->
-         <a href="saldos_pdf.php" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
+
+        <!-- Formulario para seleccionar rango de fechas -->
+        <form method="GET" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="desde" class="form-label">Desde:</label>
+                    <input type="date" id="desde" name="desde" class="form-control" value="<?= $_GET['desde'] ?? '' ?>">
+                </div>
+                <div class="col-md-4">
+                    <label for="hasta" class="form-label">Hasta:</label>
+                    <input type="date" id="hasta" name="hasta" class="form-control" value="<?= $_GET['hasta'] ?? '' ?>">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="<?= strtok($_SERVER["REQUEST_URI"], '?') ?>" class="btn btn-secondary ms-2">Limpiar Filtros</a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Botón para imprimir saldos en PDF -->
+        <a href="saldos_pdf.php?desde=<?= $_GET['desde'] ?? '' ?>&hasta=<?= $_GET['hasta'] ?? '' ?>" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
+
+        <?php
+        // Calcular el total a cobrar y la deuda pendiente
+        $total_a_cobrar = 0;
+        $deuda_pendiente = 0;
+
+        if (isset($result) && $result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $total_a_cobrar += $row["total_general"];
+                $deuda_pendiente += $row["total_general"];
+            }
+        }
+        ?>
+
+        <!-- Mostrar total a cobrar y deuda pendiente -->
+        <h2>Total a Cobrar: <?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</h2>
+        <h2>Deuda Pendiente: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h2>
+
         <?php if (isset($result) && $result->num_rows > 0): ?>
             <table id="saldosTable" class="table table-bordered mt-4">
                 <thead>
@@ -88,69 +135,39 @@ $result = $conn->query($sql);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-                    // Inicializar las variables para sumar los totales
-                    $total_no_vencido = 0;
-                    $total_de_1_a_15_dias = 0;
-                    $total_de_16_a_30_dias = 0;
-                    $total_de_31_a_60_dias = 0;
-                    $total_mas_de_60_dias = 0;
-                    $total_general = 0;
-
-                    while($row = $result->fetch_assoc()):
-                        // Sumar los totales
-                        $total_no_vencido += $row["no_vencido"];
-                        $total_de_1_a_15_dias += $row["de_1_a_15_dias"];
-                        $total_de_16_a_30_dias += $row["de_16_a_30_dias"];
-                        $total_de_31_a_60_dias += $row["de_31_a_60_dias"];
-                        $total_mas_de_60_dias += $row["mas_de_60_dias"];
-                        $total_general += $row["total_general"];
-                    ?>
+                    <?php 
+                    // Reiniciar el puntero al resultado para volver a recorrerlo
+                    $result->data_seek(0); 
+                    while($row = $result->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo $row["cliente_nombre"]; ?></td>
-                            <td><?php echo $row["fecha_documento"]; ?></td>
-                            <td><?php echo $row["numero_documento"]; ?></td>
-                            <td><?php echo $row["dias_credito"]; ?></td>
-                            <td><?php echo $row["dias_vencido"]; ?></td>
-                            <td><?php echo number_format($row["no_vencido"], 0, '', '.') . " Gs"; ?></td>
-                            <td><?php echo number_format($row["de_1_a_15_dias"], 0, '', '.') . " Gs"; ?></td>
-                            <td><?php echo number_format($row["de_16_a_30_dias"], 0, '', '.') . " Gs"; ?></td>
-                            <td><?php echo number_format($row["de_31_a_60_dias"], 0, '', '.') . " Gs"; ?></td>
-                            <td><?php echo number_format($row["mas_de_60_dias"], 0, '', '.') . " Gs"; ?></td>
-                            <td><?php echo number_format($row["total_general"], 0, '', '.') . " Gs"; ?></td>
+                            <td><?= $row["cliente_nombre"] ?></td>
+                            <td><?= $row["fecha_documento"] ?></td>
+                            <td><?= $row["numero_documento"] ?></td>
+                            <td><?= $row["dias_credito"] ?></td>
+                            <td><?= $row["dias_vencido"] ?></td>
+                            <td><?= number_format($row["no_vencido"], 0, '', '.') . " Gs" ?></td>
+                            <td><?= number_format($row["de_1_a_15_dias"], 0, '', '.') . " Gs" ?></td>
+                            <td><?= number_format($row["de_16_a_30_dias"], 0, '', '.') . " Gs" ?></td>
+                            <td><?= number_format($row["de_31_a_60_dias"], 0, '', '.') . " Gs" ?></td>
+                            <td><?= number_format($row["mas_de_60_dias"], 0, '', '.') . " Gs" ?></td>
+                            <td><?= number_format($row["total_general"], 0, '', '.') . " Gs" ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
-                <!-- Fila de totales -->
-                <tfoot>
-                    <tr>
-                        <th colspan="5" class="text-center">Totales</th>
-                        <th><?php echo number_format($total_no_vencido, 0, '', '.') . " Gs"; ?></th>
-                        <th><?php echo number_format($total_de_1_a_15_dias, 0, '', '.') . " Gs"; ?></th>
-                        <th><?php echo number_format($total_de_16_a_30_dias, 0, '', '.') . " Gs"; ?></th>
-                        <th><?php echo number_format($total_de_31_a_60_dias, 0, '', '.') . " Gs"; ?></th>
-                        <th><?php echo number_format($total_mas_de_60_dias, 0, '', '.') . " Gs"; ?></th>
-                        <th><?php echo number_format($total_general, 0, '', '.') . " Gs"; ?></th>
-                    </tr>
-                </tfoot>
             </table>
         <?php else: ?>
-            <p>No se encontraron saldos.</p>
+            <p>No se encontraron saldos en el rango seleccionado.</p>
         <?php endif; ?>
     </div>
 
-    <!-- Incluir jQuery -->
+    <!-- Scripts -->
     <script src="../../assets/jquery/jquery-3.6.0.min.js"></script>
-    <!-- Incluir JS de DataTables -->
     <script src="../../assets/datatables/js/jquery.dataTables.min.js"></script>
-    <!-- Inicializar DataTables -->
     <script>
         $(document).ready(function() {
             $('#saldosTable').DataTable();
         });
     </script>
-    
-    <!-- Incluir Bootstrap JS -->
     <script src="../../assets/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

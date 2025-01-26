@@ -54,6 +54,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Editar Cargo</title>
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../assets/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link rel="icon" href="../../assets/logo.png" type="image/png">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
