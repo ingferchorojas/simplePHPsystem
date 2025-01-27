@@ -136,6 +136,21 @@ ALTER TABLE `cargos`
   ADD CONSTRAINT `cargos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`);
 COMMIT;
 
+CREATE TABLE `deudas` (
+  `id` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `categoria` varchar(255) NOT NULL,
+  `notas` text DEFAULT NULL,
+  `monto` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+--
+-- Indices de la tabla `deudas`
+--
+ALTER TABLE `deudas`
+  ADD PRIMARY KEY (`id`);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
