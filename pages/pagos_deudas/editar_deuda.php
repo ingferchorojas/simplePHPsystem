@@ -86,12 +86,12 @@ $conn->close();
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="pagos_deudas.php">Lista de deudas</a>
+            <a class="navbar-brand" href="pagos_deudas.php">Lista de pagos</a>
         </div>
     </nav>
 
     <div class="container mt-5" style="max-width: 600px;">
-        <h2>Editar Deuda</h2>
+        <h2>Editar Pago</h2>
 
         <!-- Formulario para editar deuda -->
         <form action="editar_deuda.php?id=<?php echo $id; ?>" method="POST">

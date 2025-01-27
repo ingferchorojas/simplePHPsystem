@@ -29,7 +29,7 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deudas</title>
+    <title>Pagos</title>
     <!-- Incluir Bootstrap para los estilos -->
     <link href="../../assets/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Incluir CSS de DataTables -->
@@ -46,10 +46,10 @@ $result = $stmt->get_result();
     </nav>
 
     <div class="container mt-5">
-        <h2>Lista de Deudas</h2>
+        <h2>Lista de Pagos</h2>
         
         <!-- Botón para agregar deuda -->
-        <a href="agregar_deuda.php" class="btn btn-primary mb-3">Agregar Deuda</a>
+        <a href="agregar_deuda.php" class="btn btn-primary mb-3">Agregar Pago</a>
 
         <!-- Botón para imprimir deudas en PDF -->
 		<a href="deudas_pdf.php?desde=<?php echo $desde; ?>&hasta=<?php echo $hasta; ?>" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>

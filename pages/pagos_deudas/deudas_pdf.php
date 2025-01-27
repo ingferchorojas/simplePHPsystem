@@ -21,7 +21,7 @@ class PDF extends FPDF
         // Ajustar el título un poco más arriba
         $this->SetY(25); // Subir el título ligeramente
         $this->SetFont('Arial', 'B', 12);
-        $this->Cell(0, 10, utf8_decode('Lista de Deudas'), 0, 1, 'C');
+        $this->Cell(0, 10, utf8_decode('Lista de Pagos'), 0, 1, 'C');
         
         // Dibujar la línea debajo del título más arriba
         $this->Line(10, 35, 200, 35); // Subir la línea ligeramente
@@ -77,6 +77,10 @@ $pdf->Ln();
 
 // Inicializar el total
 $totalMonto = 0;
+$totalMontoPersonal = 0;
+$totalMontoDeudas = 0;
+$totalMontoFletes = 0;
+$totalMontoPosibles = 0;
 
 // Datos de las deudas
 $pdf->SetFont('Arial', '', 10);
@@ -87,7 +91,19 @@ if ($result->num_rows > 0) {
         $pdf->Cell(70, 10, utf8_decode($row['notas']), 1, 0, 'C');
         $pdf->Cell(30, 10, number_format($row['monto'], 0, '', '.'), 1, 0, 'C');
         $pdf->Ln();
-        
+
+        if ($row['categoria'] == "Pago de personal") {
+            $totalMontoPersonal += $row['monto'];
+        }
+        if ($row['categoria'] == "Pago de deudas") {
+            $totalMontoDeudas += $row['monto'];
+        }
+        if ($row['categoria'] == "Pago de fletes") {
+            $totalMontoFletes += $row['monto'];
+        }
+        if ($row['categoria'] == "Posibles pagos") {
+            $totalMontoPosibles += $row['monto'];
+        }
         // Sumar el monto al total
         $totalMonto += $row['monto'];
     }
@@ -97,11 +113,34 @@ if ($result->num_rows > 0) {
     $pdf->Cell($totalWidth, 10, utf8_decode('No se encontraron deudas.'), 1, 1, 'C');
 }
 
-// Mostrar el total
-$pdf->Ln(5); // Espaciado antes del total
+
+$pdf->Ln(5);
+$pdf->SetFont('Arial', 'B', 10);
+
+// Pago de personal
+$pdf->Cell(60, 10, utf8_decode('Pago de personal'), 1, 0, 'C');
+$pdf->Cell(60, 10, number_format($totalMontoPersonal, 0, '', '.'), 1, 0, 'C');
+$pdf->Ln();
+
+// Pago de deudas
+$pdf->Cell(60, 10, utf8_decode('Pago de deudas'), 1, 0, 'C');
+$pdf->Cell(60, 10, number_format($totalMontoDeudas, 0, '', '.'), 1, 0, 'C');
+$pdf->Ln();
+
+// Pago de fletes
+$pdf->Cell(60, 10, utf8_decode('Pago de fletes'), 1, 0, 'C');
+$pdf->Cell(60, 10, number_format($totalMontoFletes, 0, '', '.'), 1, 0, 'C');
+$pdf->Ln();
+
+// Posibles pagos
+$pdf->Cell(60, 10, utf8_decode('Posibles pagos'), 1, 0, 'C');
+$pdf->Cell(60, 10, number_format($totalMontoPosibles, 0, '', '.'), 1, 0, 'C');
+$pdf->Ln();
+// Total
 $pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(40, 10, utf8_decode('Total'), 1, 0, 'C');
-$pdf->Cell(40, 10, number_format($totalMonto, 0, '', '.'), 1, 0, 'C');
+$pdf->Cell(60, 10, utf8_decode('Total'), 1, 0, 'C');
+$pdf->Cell(60, 10, number_format($totalMontoPersonal + $totalMontoDeudas + $totalMontoFletes + $totalMontoPosibles, 0, '', '.'), 1, 0, 'C');
+
 
 // Salida del PDF en el navegador
 $pdf->Output('I', 'deudas.pdf');

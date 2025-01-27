@@ -34,12 +34,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="pagos_deudas.php">Lista de deudas</a>
+            <a class="navbar-brand" href="pagos_deudas.php">Lista de pagos</a>
         </div>
     </nav>
 
     <div class="container mt-5" style="max-width: 600px;">
-        <h2>Formulario de Nueva Deuda</h2>
+        <h2>Formulario de Nuevo Pago</h2>
 
         <form action="agregar_deuda.php" method="POST">
             <div class="mb-3">
