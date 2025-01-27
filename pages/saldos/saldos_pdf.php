@@ -123,15 +123,33 @@ if (isset($result) && $result->num_rows > 0) {
     }
 }
 
+// Calcular el efectivo
 $efectivo = $total_a_cobrar - $deuda_pendiente;
 
+// Consulta SQL con filtro de fechas y suma de montos para el pago de deudas
+$sql_deudas = "
+SELECT SUM(monto) AS total_pago_deudas
+FROM deudas
+WHERE fecha BETWEEN '$desde' AND '$hasta'";
+
+// Ejecutar la consulta para obtener la suma de pagos de deudas
+$result_deudas = $conn->query($sql_deudas);
+
+// Comprobar si hay resultados
+if ($result_deudas->num_rows > 0) {
+    $row_deudas = $result_deudas->fetch_assoc();
+    $pago_deudas = $row_deudas['total_pago_deudas'];
+} else {
+    $pago_deudas = 0; // Si no hay resultados, se establece en 0
+}
 
 // Mostrar los totales sobre la tabla
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(50, 10, utf8_decode('Total a cobrar: ' . number_format($total_a_cobrar, 0, '', '.') . ' Gs.'), 0, 0, 'L');
-$pdf->Cell(50, 10, utf8_decode('Deuda pendiente: ' . number_format($deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
-$pdf->Cell(50, 10, utf8_decode('Efectivo: ' . number_format($total_a_cobrar - $deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 1, 'L');
-
+$pdf->Cell(50, 10, utf8_decode('No cobrado: ' . number_format($deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 0, 'L');
+$pdf->Cell(50, 10, utf8_decode('Cobrado: ' . number_format($total_a_cobrar - $deuda_pendiente, 0, '', '.') . ' Gs.'), 0, 0, 'L');
+$pdf->Cell(50, 10, utf8_decode('Pago de deudas: ' . number_format($pago_deudas, 0, '', '.') . ' Gs.'), 0, 1, 'L');
+$pdf->Cell(50, 10, utf8_decode('Efectivo: ' . number_format(($total_a_cobrar - $deuda_pendiente) - $pago_deudas, 0, '', '.') . ' Gs.'), 0, 1, 'L');
 $pdf->Ln(5);
 
 // Encabezados de la tabla
@@ -163,13 +181,10 @@ if ($result->num_rows > 0) {
         $pdf->Cell(25, 10, number_format($row['de_16_a_30_dias'], 0, '', '.'), 1, 0, 'C');
         $pdf->Cell(25, 10, number_format($row['de_31_a_60_dias'], 0, '', '.'), 1, 0, 'C');
         $pdf->Cell(25, 10, number_format($row['mas_de_60_dias'], 0, '', '.'), 1, 0, 'C');
-        $pdf->Cell(25, 10, number_format($row['total_general'], 0, '', '.'), 1, 0, 'C');
+        $pdf->Cell(25, 10, number_format($row['total_cargo'], 0, '', '.'), 1, 0, 'C');
         $pdf->Ln();
     }
-} else {
-    $pdf->Cell(280, 10, utf8_decode('No se encontraron saldos de clientes.'), 1, 1, 'C');
 }
 
-// Salida del PDF en el navegador
-$pdf->Output('I', 'saldos_clientes.pdf');
+$pdf->Output();
 ?>

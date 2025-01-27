@@ -127,12 +127,33 @@ $result = $conn->query($sql);
         <?php
         // Calcular el efectivo
         $efectivo = $total_a_cobrar - $deuda_pendiente;
+
+        // Consulta SQL con filtro de fechas y suma de montos
+        $sql_deudas = "
+        SELECT SUM(monto) AS total_pago_deudas
+        FROM deudas
+        WHERE fecha BETWEEN '$fecha_desde' AND '$fecha_hasta'";
+
+        // Ejecutar la consulta para obtener la suma de pagos de deudas
+        $result_deudas = $conn->query($sql_deudas);
+
+        // Comprobar si hay resultados
+        if ($result_deudas->num_rows > 0) {
+            $row_deudas = $result_deudas->fetch_assoc();
+            $pago_deudas = $row_deudas['total_pago_deudas'];
+        } else {
+            $pago_deudas = 0; // Si no hay resultados, se establece en 0
+        }
+
+
         ?>
 
         <!-- Mostrar total a cobrar y deuda pendiente -->
         <h3>Total a Cobrar: <?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</h3>
-        <h3>Deuda Pendiente: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h3>
-        <h3>Efectivo: <?= number_format($efectivo, 0, '', '.') ?> Gs</h3>
+        <h3>Cobrado: <?= number_format($efectivo, 0, '', '.') ?> Gs</h3>
+        <h3>No cobrado: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h3>
+        <h3>Pago de deudas: <?= number_format($pago_deudas, 0, '', '.') ?> Gs</h3>
+        <h3>Efectivo: <?= number_format($efectivo - $pago_deudas, 0, '', '.') ?> Gs</h3>
 
         <?php if (isset($result) && $result->num_rows > 0): ?>
             <table id="saldosTable" class="table table-bordered mt-4">
