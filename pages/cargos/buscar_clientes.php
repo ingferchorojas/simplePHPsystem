@@ -6,7 +6,7 @@ include('../../config/db.php');
 $filtro = isset($_GET['filtro']) ? $_GET['filtro'] : '';
 
 // Realizar la consulta para obtener los clientes que coincidan con el filtro
-$sql = "SELECT id, nombre, apellido, telefono FROM clientes WHERE nombre LIKE ? OR apellido LIKE ? OR telefono LIKE ?";
+$sql = "SELECT id, nombre, apellido, telefono FROM clientes WHERE (nombre LIKE ? OR apellido LIKE ? OR telefono LIKE ?) AND deleted = 0";
 $stmt = $conn->prepare($sql);
 $likeFiltro = "%$filtro%";
 $stmt->bind_param("sss", $likeFiltro, $likeFiltro, $likeFiltro);
