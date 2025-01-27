@@ -26,6 +26,7 @@ $sql = "
         abonos a ON a.numero_documento = c.numero_documento
     WHERE 
         c.deleted = 0
+        and cl.deleted = 0
     GROUP BY 
         c.id
 ";
