@@ -51,9 +51,9 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                        <h5 class="card-title">Antigüedad de Saldos</h5>
-                        <p class="card-text">Consulta la antigüedad de los saldos de los clientes.</p>
-                        <a href="pages/saldos/saldos.php" class="btn btn-primary">Ver Antigüedad</a>
+                        <h5 class="card-title">Saldos</h5>
+                        <p class="card-text">Consulta los saldos de los clientes.</p>
+                        <a href="pages/saldos/saldos.php" class="btn btn-primary">Ver Saldos</a>
                     </div>
                 </div>
             </div>
@@ -66,6 +66,20 @@
                         <h5 class="card-title">Estado de Cuentas</h5>
                         <p class="card-text">Consulta el estado de las cuentas de los clientes.</p>
                         <a href="pages/estado_cuentas/estado_cuentas.php" class="btn btn-primary">Ver Estado</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Card 5: Pago de deudas -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
+                        <h5 class="card-title">Pago de deudas</h5>
+                        <p class="card-text">Realiza pagos para saldar las deudas de los clientes.</p>
+                        <a href="pages/pagos_deudas/pagos_deudas.php" class="btn btn-primary">Ver Pagos</a>
                     </div>
                 </div>
             </div>

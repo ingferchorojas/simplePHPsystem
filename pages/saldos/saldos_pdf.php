@@ -32,6 +32,16 @@ class PDF extends FPDF
         $this->SetFont('Arial', 'B', 12);
         $this->Ln(20);
         $this->Cell(0, 10, utf8_decode('Saldos de Clientes'), 0, 1, 'C');
+        
+        // Mostrar las fechas desde y hasta como subtítulos
+        global $desde, $hasta;
+        if ($desde) {
+            $this->Cell(0, 10, utf8_decode('Desde: ' . $desde), 0, 1, 'L');
+        }
+        if ($hasta) {
+            $this->Cell(0, 10, utf8_decode('Hasta: ' . $hasta), 0, 1, 'L');
+        }
+        
         $this->Line(10, 40, 280, 40);
         $this->Ln(10);
     }
