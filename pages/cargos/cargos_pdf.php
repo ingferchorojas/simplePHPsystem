@@ -38,14 +38,15 @@ function TableHeader()
     $this->SetFont('Arial', 'B', 10);
     $this->Cell(20, 10, 'Fecha', 1, 0, 'C');
     $this->Cell(50, 10, utf8_decode('Cliente'), 1, 0, 'C');
-    $this->Cell(25, 10, 'Doc', 1, 0, 'C');
+    $this->Cell(20, 10, 'Doc', 1, 0, 'C');
     $this->Cell(15, 10, utf8_decode('D. Créd.'), 1, 0, 'C');
     $this->Cell(15, 10, utf8_decode('Kg'), 1, 0, 'C');
-    $this->Cell(23, 10, 'Cargo', 1, 0, 'C');
+    $this->Cell(15, 10, utf8_decode('Cerdos'), 1, 0, 'C');
+    $this->Cell(20, 10, 'Cargo', 1, 0, 'C');
     $this->Cell(70, 10, utf8_decode('Concepto'), 1, 0, 'C'); // Nueva columna
     $this->Cell(15, 10, utf8_decode('D Venc.'), 1, 0, 'C');
-    $this->Cell(23, 10, 'Abonos', 1, 0, 'C');
-    $this->Cell(23, 10, 'Restante', 1, 0, 'C');
+    $this->Cell(20, 10, 'Abonos', 1, 0, 'C');
+    $this->Cell(20, 10, 'Restante', 1, 0, 'C');
     $this->Ln();
 }
 
@@ -55,14 +56,15 @@ function TableRow($row)
     $this->SetFont('Arial', '', 10);
     $this->Cell(20, 10, $row['fecha'], 1, 0, 'C');
     $this->Cell(50, 10, utf8_decode(mb_substr($row['nombre'] . ' ' . $row['apellido'], 0, 19)), 1, 0, 'C');
-    $this->Cell(25, 10, $row['numero_documento'], 1, 0, 'C');
+    $this->Cell(20, 10, $row['numero_documento'], 1, 0, 'C');
     $this->Cell(15, 10, $row['dias_credito'], 1, 0, 'C');
     $this->Cell(15, 10, $row['kg'], 1, 0, 'C');
-    $this->Cell(23, 10, number_format($row['cargo'], 0, '', '.'), 1, 0, 'C');
+    $this->Cell(15, 10, $row['cantidad_cerdos'], 1, 0, 'C');
+    $this->Cell(20, 10, number_format($row['cargo'], 0, '', '.'), 1, 0, 'C');
     $this->Cell(70, 10, utf8_decode(mb_substr($row['concepto'], 0, 29)), 1, 0, 'C'); // Nueva celda para el concepto
     $this->Cell(15, 10, $row['dias_vencidos'], 1, 0, 'C');
-    $this->Cell(23, 10, number_format($row['total_abonos'], 0, '', '.'), 1, 0, 'C');
-    $this->Cell(23, 10, number_format($row['cargo'] - $row['total_abonos'], 0, '', '.'), 1, 0, 'C');
+    $this->Cell(20, 10, number_format($row['total_abonos'], 0, '', '.'), 1, 0, 'C');
+    $this->Cell(20, 10, number_format($row['cargo'] - $row['total_abonos'], 0, '', '.'), 1, 0, 'C');
     $this->Ln();
 }
 
@@ -87,6 +89,7 @@ $sql = "
         c.dias_credito, 
         c.cargo, 
         c.kg,
+        c.cantidad_cerdos,
         c.concepto, 
         SUM(a.monto_abono) AS total_abonos,
         IF(DATEDIFF(CURRENT_DATE, DATE_ADD(c.fecha, INTERVAL c.dias_credito DAY)) < 0, 0, DATEDIFF(CURRENT_DATE, DATE_ADD(c.fecha, INTERVAL c.dias_credito DAY))) AS dias_vencidos

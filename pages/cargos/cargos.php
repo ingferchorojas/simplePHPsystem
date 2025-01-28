@@ -13,6 +13,7 @@ $sql = "
         c.numero_documento, 
         c.dias_credito, 
         c.cargo, 
+        c.cantidad_cerdos,
         c.concepto, 
         c.kg,  -- Agregar la columna 'kg'
         c.precio_por_kg,  -- Agregar la columna 'precio_por_kg'
@@ -65,18 +66,19 @@ $result = $conn->query($sql);
         <a href="agregar_abono.php" class="btn btn-primary mb-3">Agregar Abono</a>
         <a href="cargos_pdf.php" target="_blank" class="btn btn-primary mb-3">Ver PDF</a>
         <?php if ($result->num_rows > 0): ?>
-            <table id="cargosTable" class="table table-bordered mt-4">
+            <table id="cargosTable" class="table table-bordered mt-4 .table-responsive">
             <thead>
             <tr>
                 <th>Fecha</th>
                 <th>Cliente</th>
                 <th>Doc.</th>
-                <th>Días de Crédito</th>
+                <th>D. de Créd.</th>
                 <th>Cargo</th>
                 <th>Concepto</th>
                 <th>Kg</th> <!-- Nueva columna para kg -->
-                <th>Precio por Kg</th> <!-- Nueva columna para precio por kg -->
-                <th>Días vencido</th>
+                <th>Cerdos</th>
+                <th>Gs/Kg</th> <!-- Nueva columna para precio por kg -->
+                <th>D. Venc.</th>
                 <th>Abonos</th>
                 <th>Saldo restante</th>
                 <th></th>
@@ -94,6 +96,7 @@ $result = $conn->query($sql);
                 <td><?php echo number_format($row["cargo"], 0, '', '.'); ?> Gs</td>
                 <td><?php echo $row["concepto"]; ?></td>
                 <td><?php echo $row["kg"]; ?></td> <!-- Mostrar el valor de kg -->
+                <td><?php echo $row["cantidad_cerdos"]; ?></td>
                 <td><?php echo number_format($row["precio_por_kg"], 0, '', '.'); ?> Gs</td> <!-- Mostrar el valor de precio por kg -->
                 <td><?php echo $row["dias_vencidos"]; ?></td>
                 <td><?php echo number_format($row["total_abonos"], 0, '', '.'); ?> Gs</td>

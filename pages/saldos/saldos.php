@@ -13,6 +13,7 @@ SELECT
     ca.fecha AS fecha_documento,
     ca.numero_documento,
     ca.dias_credito,
+    ca.cantidad_cerdos,
     ca.kg,
     GREATEST(0, DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY))) AS dias_vencido,
     CASE 
@@ -106,6 +107,7 @@ $result = $conn->query($sql);
         $total_a_cobrar = 0;
         $deuda_pendiente = 0;
         $total_kg = 0;
+        $total_cerdos = 0;
         $totales_columnas = [
             'no_vencido' => 0,
             'de_1_a_15_dias' => 0,
@@ -120,6 +122,7 @@ $result = $conn->query($sql);
                 $total_a_cobrar += $row["total_cargo"];
                 $deuda_pendiente += $row["total_general"];
                 $total_kg += $row["kg"];
+                $total_cerdos += $row["cantidad_cerdos"];
                 foreach ($totales_columnas as $col => $total) {
                     $totales_columnas[$col] += $row[$col];
                 }
@@ -154,15 +157,19 @@ $result = $conn->query($sql);
         <!-- Mostrar total a cobrar y deuda pendiente -->
         <div class="container mt-4">
             <div class="row text-center">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <h3>Total a Cobrar:</h3>
                     <p class="fw-bold fs-5"><?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <h3>Total kg:</h3>
                     <p class="fw-bold fs-5"><?= $total_kg ?> Gs</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <h3>Total cerdos:</h3>
+                    <p class="fw-bold fs-5"><?= $total_cerdos ?></p>
+                </div>
+                <div class="col-md-3">
                     <h3>Cobrado:</h3>
                     <p class="fw-bold fs-5"><?= number_format($efectivo, 0, '', '.') ?> Gs</p>
                 </div>

@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $cargo = $_POST['cargo'];
     $concepto = $_POST['concepto'];
     $kg = $_POST['kg']; // Obtener los kg del formulario
+    $cantidad_cerdos = $_POST['cantidad_cerdos'];
     $precio_por_kg = $_POST['precio_por_kilo']; // Obtener el precio por kilo del formulario
 
     // Consulta para verificar si ya existe un documento con ese número
@@ -23,8 +24,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "<script>alert('El número de documento ya existe.'); window.location.href = 'agregar_cargo.php';</script>";
     } else {
         // Si no existe, insertar el nuevo cargo
-        $sql = "INSERT INTO cargos (cliente_id, fecha, numero_documento, dias_credito, cargo, concepto, kg, precio_por_kg) 
-                VALUES ('$cliente_id', '$fecha', '$doc_num', '$dias_credito', '$cargo', '$concepto', '$kg', '$precio_por_kg')";
+        $sql = "INSERT INTO cargos (cliente_id, fecha, numero_documento, dias_credito, cargo, concepto, kg, precio_por_kg, cantidad_cerdos) 
+                VALUES ('$cliente_id', '$fecha', '$doc_num', '$dias_credito', '$cargo', '$concepto', '$kg', '$precio_por_kg', '$cantidad_cerdos')";
 
         if ($conn->query($sql) === TRUE) {
             echo "<script>alert('Cargo agregado'); window.location.href = 'cargos.php';</script>";
@@ -90,11 +91,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="kg" class="form-label">Kg</label>
                 <input type="number" class="form-control" id="kg" name="kg" step="any" required oninput="calcularCargo()">
             </div>
+
             
             <!-- Campo de precio por kilo -->
             <div class="mb-3">
                 <label for="precio_por_kilo" class="form-label">Precio x Kilo</label>
                 <input type="number" class="form-control" id="precio_por_kilo" name="precio_por_kilo" step="any" required oninput="calcularCargo()">
+            </div>
+
+            <div class="mb-3">
+                <label for="cantidad_cerdos" class="form-label">Cantidad de cerdos</label>
+                <input type="number" class="form-control" id="cantidad_cerdos" name="cantidad_cerdos">
             </div>
             
             <!-- Campo de cargo calculado -->

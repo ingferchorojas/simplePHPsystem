@@ -66,6 +66,7 @@ SELECT
     ca.fecha AS fecha_documento,
     ca.numero_documento,
     ca.dias_credito,
+    ca.cantidad_cerdos,
     ca.kg,
     GREATEST(0, DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY))) AS dias_vencido,
     CASE 
@@ -116,6 +117,7 @@ $result = $conn->query($sql);
 $total_a_cobrar = 0;
 $deuda_pendiente = 0;
 $total_kg = 0;
+$total_cerdos = 0;
 
 // Calculamos los totales
 if (isset($result) && $result->num_rows > 0) {
@@ -123,6 +125,7 @@ if (isset($result) && $result->num_rows > 0) {
         $total_a_cobrar += $row["total_cargo"];
         $deuda_pendiente += $row["total_general"];
         $total_kg += $row["kg"];
+        $total_cerdos += $row["cantidad_cerdos"];
     }
 }
 
@@ -177,6 +180,11 @@ $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(70, 10, utf8_decode('Total Kg:'), 0, 0, 'L');
 $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(70, 10, $total_kg, 0, 1, 'L');
+
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(70, 10, utf8_decode('Total cerdos:'), 0, 0, 'L');
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(70, 10, $total_cerdos, 0, 1, 'L');
 
 $pdf->Ln(5); // Espacio adicional entre secciones
 
