@@ -13,6 +13,7 @@ SELECT
     ca.fecha AS fecha_documento,
     ca.numero_documento,
     ca.dias_credito,
+    ca.kg,
     GREATEST(0, DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY))) AS dias_vencido,
     CASE 
         WHEN DATEDIFF(CURDATE(), DATE_ADD(ca.fecha, INTERVAL ca.dias_credito DAY)) <= 0 THEN CAST(ca.cargo AS UNSIGNED)
@@ -104,6 +105,7 @@ $result = $conn->query($sql);
         // Calcular el total a cobrar y la deuda pendiente
         $total_a_cobrar = 0;
         $deuda_pendiente = 0;
+        $total_kg = 0;
         $totales_columnas = [
             'no_vencido' => 0,
             'de_1_a_15_dias' => 0,
@@ -117,6 +119,7 @@ $result = $conn->query($sql);
             while($row = $result->fetch_assoc()) {
                 $total_a_cobrar += $row["total_cargo"];
                 $deuda_pendiente += $row["total_general"];
+                $total_kg += $row["kg"];
                 foreach ($totales_columnas as $col => $total) {
                     $totales_columnas[$col] += $row[$col];
                 }
@@ -149,11 +152,36 @@ $result = $conn->query($sql);
         ?>
 
         <!-- Mostrar total a cobrar y deuda pendiente -->
-        <h3>Total a Cobrar: <?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</h3>
-        <h3>Cobrado: <?= number_format($efectivo, 0, '', '.') ?> Gs</h3>
-        <h3>No cobrado: <?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</h3>
-        <h3>Pago de deudas: <?= number_format($pago_deudas, 0, '', '.') ?> Gs</h3>
-        <h3>Efectivo: <?= number_format($efectivo - $pago_deudas, 0, '', '.') ?> Gs</h3>
+        <div class="container mt-4">
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h3>Total a Cobrar:</h3>
+                    <p class="fw-bold fs-5"><?= number_format($total_a_cobrar, 0, '', '.') ?> Gs</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>Total kg:</h3>
+                    <p class="fw-bold fs-5"><?= $total_kg ?> Gs</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>Cobrado:</h3>
+                    <p class="fw-bold fs-5"><?= number_format($efectivo, 0, '', '.') ?> Gs</p>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-4">
+                    <h3>No cobrado:</h3>
+                    <p class="fw-bold fs-5"><?= number_format($deuda_pendiente, 0, '', '.') ?> Gs</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>Pago de deudas:</h3>
+                    <p class="fw-bold fs-5"><?= number_format($pago_deudas, 0, '', '.') ?> Gs</p>
+                </div>
+                <div class="col-md-4">
+                    <h3>Efectivo:</h3>
+                    <p class="fw-bold fs-5"><?= number_format($efectivo - $pago_deudas, 0, '', '.') ?> Gs</p>
+                </div>
+            </div>
+        </div>
 
         <?php if (isset($result) && $result->num_rows > 0): ?>
             <table id="saldosTable" class="table table-bordered mt-4">
