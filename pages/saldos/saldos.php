@@ -138,7 +138,12 @@ $result = $conn->query($sql);
         $sql_deudas = "
         SELECT SUM(monto) AS total_pago_deudas
         FROM deudas
-        WHERE fecha BETWEEN '$fecha_desde' AND '$fecha_hasta'";
+        WHERE 1";
+
+        // Agregar filtro de fechas si se proporcionan
+        if (!empty($fecha_desde) && !empty($fecha_hasta)) {
+            $sql_deudas .= " AND fecha BETWEEN '$fecha_desde' AND '$fecha_hasta'";
+        }
 
         // Ejecutar la consulta para obtener la suma de pagos de deudas
         $result_deudas = $conn->query($sql_deudas);
